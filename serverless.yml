@@ -1,0 +1,120 @@
+service: pricing-algorithm-prod 
+
+plugins:
+  - serverless-python-requirements
+package:
+  individually: true
+custom:
+    application: pricing-algo
+    GitHubBranch: master
+    TechnicalContact: tgilbertson@omnilogistics.com
+    BlueYonderApiGatewayResourcePath: "blueyonder"
+provider:
+    name: aws
+    runtime: python3.9
+    region: ${opt:region, "us-east-1"}
+    stage: ${opt:stage, "prod"}
+    stackTags:
+        Application: Pricing Algorithm serverless application
+        CreateBy: BizCloudExperts
+        Environment: ${self:provider.stage}
+Conditions:
+EnvironmentIsProd:
+    Fn::Equals:
+    - ${self:provider.stage}
+    - prod
+
+functions:
+    ############ Lambda Functions ######################
+    BlueYonderQuote: ${file(config/lambdafunctions/BlueYonderQuote.yml):BlueYonderQuoteLambda}
+    BlueYonderRequest: ${file(config/lambdafunctions/BlueYonderRequest.yml):BlueYonderRequestLambda}
+    BlueYonderResponse: ${file(config/lambdafunctions/BlueYonderResponse.yml):BlueYonderResponseLambda}
+
+resources:
+    Resources: 
+        MyUsagePlan:
+            Type: AWS::ApiGateway::UsagePlan
+            Properties:
+                ApiStages:
+                    - ApiId: !Ref ApiGatewayRestApi
+                      Stage: ${self:provider.stage}
+                Description: Blueyonder Usage plan
+                UsagePlanName: Blueyonder
+        MyApiKey:
+            Type: AWS::ApiGateway::ApiKey
+            Properties:
+                Name: blueyonder
+                Enabled: true
+                StageKeys:
+                    - RestApiId: !Ref ApiGatewayRestApi
+                      StageName: ${self:provider.stage}
+        MyUsagePlanKey:
+            Type: AWS::ApiGateway::UsagePlanKey
+            Properties:
+                KeyId: !Ref MyApiKey
+                KeyType: API_KEY
+                UsagePlanId: !Ref MyUsagePlan
+                
+        PricingAlgoGreenscreensPassword:
+            Type: AWS::SSM::Parameter
+            Properties:
+                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/greenscreens-secret
+                Description: My SSM Parameter for Serverless App
+                Type: String
+                Value: myparametervalue
+        PricingAlgoDATPassword:
+            Type: AWS::SSM::Parameter
+            Properties:
+                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/dat-secret
+                Description: My SSM Parameter for Serverless App
+                Type: String
+                Value: myparametervalue
+        PricingAlgoGoogleAPIPassword:
+            Type: AWS::SSM::Parameter
+            Properties:
+                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/google-api-secret
+                Description: My SSM Parameter for Serverless App
+                Type: String
+                Value: myparametervalue
+        PricingAlgoBlueYonderToken:
+            Type: AWS::SSM::Parameter
+            Properties:
+                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/blue-yonder-secrets
+                Description: My SSM Parameter for Serverless App
+                Type: String
+                Value: myparametervalue
+        PricingAlgoFuelAPIPassword:
+            Type: AWS::SSM::Parameter
+            Properties:
+                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/fuel-api-secret
+                Description: My SSM Parameter for Serverless App
+                Type: String
+                Value: myparametervalue
+        PricingAlgoE2OpenBasicAuthPassword:
+            Type: AWS::SSM::Parameter
+            Properties:
+                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/e2open-secrets
+                Description: My SSM Parameter for Serverless App
+                Type: String
+                Value: myparametervalue       
+        # ################################################################################
+        # I am roles
+        ################################################################################
+        BlueYonderQuoteExecutionRole: ${file(config/iam/BlueYonderQuoteExecutionRole.yml):BlueYonderQuoteExecutionRole}
+        BlueYonderRequestExecutionRole: ${file(config/iam/BlueYonderRequestExecutionRole.yml):BlueYonderRequestExecutionRole}
+        BlueYonderResponseExecutionRole: ${file(config/iam/BlueYonderResponseExecutionRole.yml):BlueYonderResponseExecutionRole}
+        ################################################################################
+        # Resources for CloudWatch alarms & dashboards
+        ################################################################################
+        PricingAlgoNotificationTopic: ${file(config/sns/cloud-watch-notification.yml):PricingAlgoNotificationTopic}
+        PricingAlgoNotificationTopicPolicy: ${file(config/sns/cloud-watch-notification.yml):PricingAlgoNotificationTopicPolicy}
+        #SubscribeContactsPricingAlgoTopic: ${file(config/sns/cloud-watch-notification.yml):SubscribeContactsPricingAlgoTopic}
+
+        #BlockedRequestsAlarm: ${file(config/cloud-watch/blocked-request-alarm.yml):BlockedRequestsAlarm}
+
+        ################################################################################
+        # Resources for DynamoDB tables
+        ################################################################################
+        PricingAlgoDynamoDBTable: ${file(config/dynamoDB/master-table.yml):PricingAlgoDynamoDBTable}
+        ################################################################################
+       
