@@ -1,0 +1,5 @@
+PricingAlgoApiGatewayLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+        LogGroupName: API-Gateway-Execution-Logs_${PricingAlgoApiGateway}/${self:provider.stage}
+        RetentionInDays: 7

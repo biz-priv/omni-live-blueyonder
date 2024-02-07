@@ -1,0 +1,292 @@
+PricingAlgoApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+        Description: Pricing Algorithm API Gateway
+        Name:  ${self:custom.application}-${self:service}-${opt:GitHubBranch, 'default-branch'}-${pricing-algo-gateway}-1.0.0
+        EndpointConfiguration:
+            Types:
+                - REGIONAL
+        Tags:
+            - Key: Application
+              Value: ${self:custom.application}
+            - Key: DeployableUnitName
+              Value: ${self:service}
+            - Key: GitHubBranch
+              Value: ${opt:GitHubBranch, 'default-branch'}
+            - Key: Environment
+              Value: ${self:provider.stage}
+            - Key: Technical Contact
+              Value: ${opt:TechnicalContact, "tgilbertson@omnilogistics.com"}
+
+PricingAlgoApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    DependsOn: PricingAlgoApiGatewayLogGroup
+    Properties:
+        DeploymentId: !Ref PricingAlgoApiGatewayDeployment
+        RestApiId: !Ref PricingAlgoApiGateway
+        StageName: ${self:provider.stage}
+        MethodSettings:
+            - ResourcePath: "/*"
+              HttpMethod: "*"
+              LoggingLevel: INFO
+              MetricsEnabled: true
+              DataTraceEnabled: true #${opt:LogFullApiData}
+        Tags:
+            - Key: Application
+              Value: ${self:service}
+            - Key: DeployableUnitName
+              Value: ${self:service}
+            - Key: GitHubBranch
+              Value: ${opt:GitHubBranch, 'default-branch'}
+            - Key: Environment
+              Value: ${self:provider.stage}
+            - Key: Technical Contact
+              Value: ${opt:TechnicalContact, "tgilbertson@omnilogistics.com"}
+
+WebServiceApiGatewayPOST:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                $inputRoot
+            ResponseParameters:
+              method.response.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+              method.response.header.X-Content-Type-Options: "'nosniff'"
+              method.response.header.X-Frame-Options: "'SAMEORIGIN'"
+              method.response.header.X-XSS-Protection: "'1; mode=block'"
+              method.response.header.Cache-Control: "'max-age=0, no-cache, no-store, must-revalidate'"
+              method.response.header.Pragma: "'no-cache'"
+              method.response.header.Expires: "'Wed, 12 Jan 1980 05:00:00 GMT'"
+              method.response.header.Permissions-Policy: "'geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()'"
+              method.response.header.X-Permitted-Cross-Domain-Policies: "'none'"
+              method.response.header.Referrer-Policy: "'same-origin'"
+              method.response.header.Expect-CT: "'max-age=43200'"
+          - StatusCode: 400
+            SelectionPattern: .*Validation Error.*
+            ResponseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.errorMessage
+            ResponseParameters:
+              method.response.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+              method.response.header.X-Content-Type-Options: "'nosniff'"
+              method.response.header.X-Frame-Options: "'SAMEORIGIN'"
+              method.response.header.X-XSS-Protection: "'1; mode=block'"
+              method.response.header.Cache-Control: "'max-age=0, no-cache, no-store, must-revalidate'"
+              method.response.header.Pragma: "'no-cache'"
+              method.response.header.Expires: "'Wed, 12 Jan 1980 05:00:00 GMT'"
+              method.response.header.Permissions-Policy: "'geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()'"
+              method.response.header.X-Permitted-Cross-Domain-Policies: "'none'"
+              method.response.header.Referrer-Policy: "'same-origin'"
+              method.response.header.Expect-CT: "'max-age=43200'"
+          - StatusCode: 403
+            SelectionPattern: .*403.*
+            ResponseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                #set($errorMessage = $inputRoot.errorMessage.replaceAll("403: ", ""))
+                $errorMessage
+            ResponseParameters:
+              method.response.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+              method.response.header.X-Content-Type-Options: "'nosniff'"
+              method.response.header.X-Frame-Options: "'SAMEORIGIN'"
+              method.response.header.X-XSS-Protection: "'1; mode=block'"
+              method.response.header.Cache-Control: "'max-age=0, no-cache, no-store, must-revalidate'"
+              method.response.header.Pragma: "'no-cache'"
+              method.response.header.Expires: "'Wed, 12 Jan 1980 05:00:00 GMT'"
+              method.response.header.Permissions-Policy: "'geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()'"
+              method.response.header.X-Permitted-Cross-Domain-Policies: "'none'"
+              method.response.header.Referrer-Policy: "'same-origin'"
+              method.response.header.Expect-CT: "'max-age=43200'"
+          - StatusCode: 409
+            SelectionPattern: .*409.*
+            ResponseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                #set($errorMessage = $inputRoot.errorMessage.replaceAll("409: ", ""))
+                $errorMessage
+            ResponseParameters:
+              method.response.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+              method.response.header.X-Content-Type-Options: "'nosniff'"
+              method.response.header.X-Frame-Options: "'SAMEORIGIN'"
+              method.response.header.X-XSS-Protection: "'1; mode=block'"
+              method.response.header.Cache-Control: "'max-age=0, no-cache, no-store, must-revalidate'"
+              method.response.header.Pragma: "'no-cache'"
+              method.response.header.Expires: "'Wed, 12 Jan 1980 05:00:00 GMT'"
+              method.response.header.Permissions-Policy: "'geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()'"
+              method.response.header.X-Permitted-Cross-Domain-Policies: "'none'"
+              method.response.header.Referrer-Policy: "'same-origin'"
+              method.response.header.Expect-CT: "'max-age=43200'"
+          - StatusCode: 500
+            SelectionPattern: .*Error.*
+            ResponseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                $inputRoot.errorMessage
+            ResponseParameters:
+              method.response.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+              method.response.header.X-Content-Type-Options: "'nosniff'"
+              method.response.header.X-Frame-Options: "'SAMEORIGIN'"
+              method.response.header.X-XSS-Protection: "'1; mode=block'"
+              method.response.header.Cache-Control: "'max-age=0, no-cache, no-store, must-revalidate'"
+              method.response.header.Pragma: "'no-cache'"
+              method.response.header.Expires: "'Wed, 12 Jan 1980 05:00:00 GMT'"
+              method.response.header.Permissions-Policy: "'geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()'"
+              method.response.header.X-Permitted-Cross-Domain-Policies: "'none'"
+              method.response.header.Referrer-Policy: "'same-origin'"
+              method.response.header.Expect-CT: "'max-age=43200'"
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Uri: 
+          Fn::Sub:
+            - arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WebServiceArn}/invocations
+            - WebServiceArn:  WebServiceLambda.Arn
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Strict-Transport-Security: true
+            method.response.header.X-Content-Type-Options: true
+            method.response.header.X-Frame-Options: true
+            method.response.header.X-XSS-Protection: true
+            method.response.header.Cache-Control: true
+            method.response.header.Pragma: true
+            method.response.header.Expires: true
+            method.response.header.Permissions-Policy: true
+            method.response.header.X-Permitted-Cross-Domain-Policies: true
+            method.response.header.Referrer-Policy: true
+            method.response.header.Expect-CT: true
+        - StatusCode: 403
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Strict-Transport-Security: true
+            method.response.header.X-Content-Type-Options: true
+            method.response.header.X-Frame-Options: true
+            method.response.header.X-XSS-Protection: true
+            method.response.header.Cache-Control: true
+            method.response.header.Pragma: true
+            method.response.header.Expires: true
+            method.response.header.Permissions-Policy: true
+            method.response.header.X-Permitted-Cross-Domain-Policies: true
+            method.response.header.Referrer-Policy: true
+            method.response.header.Expect-CT: true
+        - StatusCode: 409
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Strict-Transport-Security: true
+            method.response.header.X-Content-Type-Options: true
+            method.response.header.X-Frame-Options: true
+            method.response.header.X-XSS-Protection: true
+            method.response.header.Cache-Control: true
+            method.response.header.Pragma: true
+            method.response.header.Expires: true
+            method.response.header.Permissions-Policy: true
+            method.response.header.X-Permitted-Cross-Domain-Policies: true
+            method.response.header.Referrer-Policy: true
+            method.response.header.Expect-CT: true
+        - StatusCode: 400
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Strict-Transport-Security: true
+            method.response.header.X-Content-Type-Options: true
+            method.response.header.X-Frame-Options: true
+            method.response.header.X-XSS-Protection: true
+            method.response.header.Cache-Control: true
+            method.response.header.Pragma: true
+            method.response.header.Expires: true
+            method.response.header.Permissions-Policy: true
+            method.response.header.X-Permitted-Cross-Domain-Policies: true
+            method.response.header.Referrer-Policy: true
+            method.response.header.Expect-CT: true
+        - StatusCode: 500
+          ResponseModels:
+            application/json: "Empty"
+          ResponseParameters:
+            method.response.header.Strict-Transport-Security: true
+            method.response.header.X-Content-Type-Options: true
+            method.response.header.X-Frame-Options: true
+            method.response.header.X-XSS-Protection: true
+            method.response.header.Cache-Control: true
+            method.response.header.Pragma: true
+            method.response.header.Expires: true
+            method.response.header.Permissions-Policy: true
+            method.response.header.X-Permitted-Cross-Domain-Policies: true
+            method.response.header.Referrer-Policy: true
+            method.response.header.Expect-CT: true
+      ResourceId: !Ref WebServiceApiResource
+      RestApiId: !Ref PricingAlgoApiGateway
+
+PricingAlgoApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: WebServiceApiGatewayPOST
+    Properties:
+        RestApiId: !Ref PricingAlgoApiGateway
+WebServicePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt WebServiceLambda.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${PricingAlgoApiGateway}/*/POST/webservice"
+
+WebServiceApiResource:
+  Type: AWS::ApiGateway::Resource
+  Properties:
+    RestApiId: !Ref PricingAlgoApiGateway
+    ParentId: !GetAtt PricingAlgoApiGateway.RootResourceId
+    PathPart:  webservice
+
+PricingAlgoFormsApiGatewayAccount:
+    Type: AWS::ApiGateway::Account
+    DependsOn: PricingAlgoApiGateway
+    Properties:
+        CloudWatchRoleArn: !GetAtt PricingAlgoApiGatewayLogsRole.Arn
+
+PricingAlgoApiGatewayMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+        DomainName: !Ref ApiGatewayDomainName
+        RestApiId: !Ref PricingAlgoApiGateway
+        Stage: !Ref PricingAlgoApiGatewayStage
+
+PricingAlgoApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+        Enabled: true
+
+PricingAlgoUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+        ApiStages:
+            - ApiId: !Ref PricingAlgoApiGateway
+              Stage: !Ref PricingAlgoApiGatewayStage
+        Quota:
+            Limit: 10000
+            Offset: 0
+            Period: DAY
+        Throttle:
+            BurstLimit: 200
+            RateLimit: 1000
+
+PricingAlgoUsagePlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+        KeyId: !Ref PricingAlgoApiKey
+        KeyType: API_KEY
+        UsagePlanId: !Ref PricingAlgoUsagePlan
+
+PricingAlgoApiGatewayLogGroup:
+  Type: AWS::Logs::LogGroup
+  Properties:
+    LogGroupName: API-Gateway-Execution-Logs_PricingAlgoApiGateway/${self:provider.stage}
+    RetentionInDays: 7

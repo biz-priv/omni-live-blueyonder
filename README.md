@@ -1,1 +1,2 @@
-# omni-live-blueyonder
+# pricing-algorithm
+LiVe's pricing algorithm
