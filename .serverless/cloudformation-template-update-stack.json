@@ -74,19 +74,19 @@
     "BlueYonderQuoteLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/pricing-algorithm-prod-BlueYonderQuote-prod"
+        "LogGroupName": "/aws/lambda/blueyonder-BlueYonderQuote-dev"
       }
     },
     "BlueYonderRequestLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/pricing-algorithm-prod-BlueYonderRequest-prod"
+        "LogGroupName": "/aws/lambda/blueyonder-BlueYonderRequest-dev"
       }
     },
     "BlueYonderResponseLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/pricing-algorithm-prod-BlueYonderResponse-prod"
+        "LogGroupName": "/aws/lambda/blueyonder-BlueYonderResponse-dev"
       }
     },
     "BlueYonderQuoteLambdaFunction": {
@@ -96,26 +96,26 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/pricing-algorithm-prod/prod/1706896128965-2024-02-02T17:48:48.965Z/BlueYonderQuote.zip"
+          "S3Key": "serverless/blueyonder/dev/1707736071647-2024-02-12T11:07:51.647Z/BlueYonderQuote.zip"
         },
         "Handler": "pricingalgorithm/blueyonder/blueyonderquote/index.lambda_handler",
         "Runtime": "python3.9",
-        "FunctionName": "pricing-algorithm-prod-BlueYonderQuote-prod",
+        "FunctionName": "blueyonder-BlueYonderQuote-dev",
         "MemorySize": 512,
         "Timeout": 60,
         "Description": "Blue Yonder Pricing Algorithm",
         "Tags": [
           {
             "Key": "Application",
-            "Value": "pricing-algo"
+            "Value": "pricing-algorithm"
           },
           {
             "Key": "Environment",
-            "Value": "prod"
+            "Value": "dev"
           },
           {
             "Key": "DeployableUnitName",
-            "Value": "pricing-algorithm-prod"
+            "Value": "blueyonder"
           },
           {
             "Key": "GitHubBranch",
@@ -128,16 +128,16 @@
         ],
         "Environment": {
           "Variables": {
-            "APPLICATION": "pricing-algo",
-            "ENVIRONMENT": "prod",
+            "APPLICATION": "pricing-algorithm",
+            "ENVIRONMENT": "dev",
             "PRICING_ALGO_DB_TABLE": {
               "Ref": "PricingAlgoDynamoDBTable"
             },
-            "IMMUTABLE_ARCHIVE": "pricing-algo-prod-pricing-algorithm-prod-PricingAlgoArchive",
-            "GREENSCREENS_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/greenscreens-secret",
-            "DAT_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/dat-secret",
-            "GOOGLE_API_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/google-api-secret",
-            "FUEL_API_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/fuel-api-secret",
+            "IMMUTABLE_ARCHIVE": "pricing-algorithm-dev-blueyonder-PricingAlgoArchive",
+            "GREENSCREENS_SECRET": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+            "DAT_SECRET": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+            "GOOGLE_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+            "FUEL_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
             "BLUE_YONDER_SECRETS": "/app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets"
           }
         },
@@ -149,7 +149,7 @@
         },
         "ReservedConcurrentExecutions": 1,
         "Layers": [
-          "arn:aws:lambda:us-east-1:941617370469:layer:Blueyonder:1"
+          "arn:aws:lambda:us-east-1:732780956165:layer:python:1"
         ]
       },
       "DependsOn": [
@@ -164,26 +164,26 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/pricing-algorithm-prod/prod/1706896128965-2024-02-02T17:48:48.965Z/BlueYonderRequest.zip"
+          "S3Key": "serverless/blueyonder/dev/1707736071647-2024-02-12T11:07:51.647Z/BlueYonderRequest.zip"
         },
         "Handler": "pricingalgorithm/blueyonder/blueyonderrequest/index.lambda_handler",
         "Runtime": "python3.9",
-        "FunctionName": "pricing-algorithm-prod-BlueYonderRequest-prod",
+        "FunctionName": "blueyonder-BlueYonderRequest-dev",
         "MemorySize": 512,
         "Timeout": 60,
         "Description": "Response to Blue Yonder request for quote",
         "Tags": [
           {
             "Key": "Application",
-            "Value": "pricing-algo"
+            "Value": "pricing-algorithm"
           },
           {
             "Key": "Environment",
-            "Value": "prod"
+            "Value": "dev"
           },
           {
             "Key": "DeployableUnitName",
-            "Value": "pricing-algorithm-prod"
+            "Value": "blueyonder"
           },
           {
             "Key": "GitHubBranch",
@@ -196,16 +196,16 @@
         ],
         "Environment": {
           "Variables": {
-            "APPLICATION": "pricing-algo",
-            "ENVIRONMENT": "prod",
+            "APPLICATION": "pricing-algorithm",
+            "ENVIRONMENT": "dev",
             "PRICING_ALGO_DB_TABLE": {
               "Ref": "PricingAlgoDynamoDBTable"
             },
-            "IMMUTABLE_ARCHIVE": "pricing-algo-prod-pricing-algorithm-prod-PricingAlgoArchive",
-            "GREENSCREENS_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/greenscreens-secret",
-            "DAT_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/dat-secret",
-            "GOOGLE_API_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/google-api-secret",
-            "FUEL_API_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/fuel-api-secret",
+            "IMMUTABLE_ARCHIVE": "pricing-algorithm-dev-blueyonder-PricingAlgoArchive",
+            "GREENSCREENS_SECRET": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+            "DAT_SECRET": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+            "GOOGLE_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+            "FUEL_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
             "BLUE_YONDER_SECRETS": "/app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets"
           }
         },
@@ -217,7 +217,7 @@
         },
         "ReservedConcurrentExecutions": 1,
         "Layers": [
-          "arn:aws:lambda:us-east-1:941617370469:layer:Blueyonder:1"
+          "arn:aws:lambda:us-east-1:732780956165:layer:python:1"
         ]
       },
       "DependsOn": [
@@ -232,26 +232,26 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/pricing-algorithm-prod/prod/1706896128965-2024-02-02T17:48:48.965Z/BlueYonderResponse.zip"
+          "S3Key": "serverless/blueyonder/dev/1707736071647-2024-02-12T11:07:51.647Z/BlueYonderResponse.zip"
         },
         "Handler": "pricingalgorithm/blueyonder/blueyonderresponse/index.lambda_handler",
         "Runtime": "python3.9",
-        "FunctionName": "pricing-algorithm-prod-BlueYonderResponse-prod",
+        "FunctionName": "blueyonder-BlueYonderResponse-dev",
         "MemorySize": 512,
         "Timeout": 60,
         "Description": "Sending response to Blue Yonder with pricing quote",
         "Tags": [
           {
             "Key": "Application",
-            "Value": "pricing-algo"
+            "Value": "pricing-algorithm"
           },
           {
             "Key": "Environment",
-            "Value": "prod"
+            "Value": "dev"
           },
           {
             "Key": "DeployableUnitName",
-            "Value": "pricing-algorithm-prod"
+            "Value": "blueyonder"
           },
           {
             "Key": "GitHubBranch",
@@ -264,16 +264,16 @@
         ],
         "Environment": {
           "Variables": {
-            "APPLICATION": "pricing-algo",
-            "ENVIRONMENT": "prod",
+            "APPLICATION": "pricing-algorithm",
+            "ENVIRONMENT": "dev",
             "PRICING_ALGO_DB_TABLE": {
               "Ref": "PricingAlgoDynamoDBTable"
             },
-            "IMMUTABLE_ARCHIVE": "pricing-algo-prod-pricing-algorithm-prod-PricingAlgoArchive",
-            "GREENSCREENS_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/greenscreens-secret",
-            "DAT_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/dat-secret",
-            "GOOGLE_API_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/google-api-secret",
-            "FUEL_API_SECRET": "/app/pricing-algo/prod/pricing-algorithm-prod/fuel-api-secret",
+            "IMMUTABLE_ARCHIVE": "pricing-algorithm-dev-blueyonder-PricingAlgoArchive",
+            "GREENSCREENS_SECRET": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+            "DAT_SECRET": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+            "GOOGLE_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+            "FUEL_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
             "BLUE_YONDER_SECRETS": "/app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets"
           }
         },
@@ -285,7 +285,7 @@
         },
         "ReservedConcurrentExecutions": 1,
         "Layers": [
-          "arn:aws:lambda:us-east-1:941617370469:layer:Blueyonder:1"
+          "arn:aws:lambda:us-east-1:732780956165:layer:python:1"
         ]
       },
       "DependsOn": [
@@ -293,7 +293,18 @@
         "BlueYonderResponseExecutionRole"
       ]
     },
-    "BlueYonderRequestLambdaVersionb9kSnrPWX1rDz9MfJdS8XeyUXYehqS8BCmcdJrUC4": {
+    "BlueYonderQuoteLambdaVersion4bKXDxld0XiReHYBcdRyFr29tycYPwkqVN580v7HNs": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "BlueYonderQuoteLambdaFunction"
+        },
+        "CodeSha256": "WIGHBC3NpB3uI7Hrvuv7jHowWXqQlccrE5oZlkZkk24=",
+        "Description": "Blue Yonder Pricing Algorithm"
+      }
+    },
+    "BlueYonderRequestLambdaVersionPXOVHQypUa972FIT4ewqdX8qLx9cZflA1WfhBQUPxU": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
@@ -304,18 +315,7 @@
         "Description": "Response to Blue Yonder request for quote"
       }
     },
-    "BlueYonderQuoteLambdaVersionoPzVqzEgJMdMmNwcU0p0UR0pD88Tzkxt6idycQ5PLc": {
-      "Type": "AWS::Lambda::Version",
-      "DeletionPolicy": "Retain",
-      "Properties": {
-        "FunctionName": {
-          "Ref": "BlueYonderQuoteLambdaFunction"
-        },
-        "CodeSha256": "7PqvDzDiIZ67e+k64saSFJhAFvsFd6WhJa9TsH+UwRo=",
-        "Description": "Blue Yonder Pricing Algorithm"
-      }
-    },
-    "BlueYonderResponseLambdaVersionmzMquMdGwMXUIuCa7TCcFvp9iR29oLTrA4ZTM0tkk0": {
+    "BlueYonderResponseLambdaVersionOmrA6YWo7xy7ZXmlp2D8RrKqLk0lzUhyPaO4AVpYlsU": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
@@ -329,7 +329,7 @@
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Name": "prod-pricing-algorithm-prod",
+        "Name": "dev-blueyonder",
         "EndpointConfiguration": {
           "Types": [
             "EDGE"
@@ -456,13 +456,13 @@
         "BlueYonderRequestLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1706896127366": {
+    "ApiGatewayDeployment1707736069970": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         },
-        "StageName": "prod"
+        "StageName": "dev"
       },
       "DependsOn": [
         "ApiGatewayMethodBlueyonderBlueyonderrequestOptions",
@@ -576,7 +576,7 @@
             "ApiId": {
               "Ref": "ApiGatewayRestApi"
             },
-            "Stage": "prod"
+            "Stage": "dev"
           }
         ],
         "Description": "Blueyonder Usage plan",
@@ -593,7 +593,7 @@
             "RestApiId": {
               "Ref": "ApiGatewayRestApi"
             },
-            "StageName": "prod"
+            "StageName": "dev"
           }
         ]
       }
@@ -613,7 +613,7 @@
     "PricingAlgoGreenscreensPassword": {
       "Type": "AWS::SSM::Parameter",
       "Properties": {
-        "Name": "/app/pricing-algo/prod/pricing-algorithm-prod/greenscreens-secret",
+        "Name": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
         "Description": "My SSM Parameter for Serverless App",
         "Type": "String",
         "Value": "myparametervalue"
@@ -622,7 +622,7 @@
     "PricingAlgoDATPassword": {
       "Type": "AWS::SSM::Parameter",
       "Properties": {
-        "Name": "/app/pricing-algo/prod/pricing-algorithm-prod/dat-secret",
+        "Name": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
         "Description": "My SSM Parameter for Serverless App",
         "Type": "String",
         "Value": "myparametervalue"
@@ -631,7 +631,7 @@
     "PricingAlgoGoogleAPIPassword": {
       "Type": "AWS::SSM::Parameter",
       "Properties": {
-        "Name": "/app/pricing-algo/prod/pricing-algorithm-prod/google-api-secret",
+        "Name": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
         "Description": "My SSM Parameter for Serverless App",
         "Type": "String",
         "Value": "myparametervalue"
@@ -640,7 +640,7 @@
     "PricingAlgoBlueYonderToken": {
       "Type": "AWS::SSM::Parameter",
       "Properties": {
-        "Name": "/app/pricing-algo/prod/pricing-algorithm-prod/blue-yonder-secrets",
+        "Name": "/app/pricing-algorithm/dev/blueyonder/blue-yonder-secrets",
         "Description": "My SSM Parameter for Serverless App",
         "Type": "String",
         "Value": "myparametervalue"
@@ -649,16 +649,7 @@
     "PricingAlgoFuelAPIPassword": {
       "Type": "AWS::SSM::Parameter",
       "Properties": {
-        "Name": "/app/pricing-algo/prod/pricing-algorithm-prod/fuel-api-secret",
-        "Description": "My SSM Parameter for Serverless App",
-        "Type": "String",
-        "Value": "myparametervalue"
-      }
-    },
-    "PricingAlgoE2OpenBasicAuthPassword": {
-      "Type": "AWS::SSM::Parameter",
-      "Properties": {
-        "Name": "/app/pricing-algo/prod/pricing-algorithm-prod/e2open-secrets",
+        "Name": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
         "Description": "My SSM Parameter for Serverless App",
         "Type": "String",
         "Value": "myparametervalue"
@@ -781,6 +772,24 @@
                         "StreamArn"
                       ]
                     }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "S3-cross-AccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::pricing-algorithm/*",
+                    "arn:aws:s3:::pricing-algorithm"
                   ]
                 }
               ]
@@ -1038,11 +1047,11 @@
         "Tags": [
           {
             "Key": "Application",
-            "Value": "pricing-algo"
+            "Value": "pricing-algorithm"
           },
           {
             "Key": "DeployableUnitName",
-            "Value": "pricing-algorithm-prod"
+            "Value": "blueyonder"
           },
           {
             "Key": "GitHubBranch",
@@ -1050,7 +1059,7 @@
           },
           {
             "Key": "Environment",
-            "Value": "prod"
+            "Value": "dev"
           },
           {
             "Key": "Technical Contact",
@@ -1116,34 +1125,34 @@
         "Ref": "ServerlessDeploymentBucket"
       },
       "Export": {
-        "Name": "sls-pricing-algorithm-prod-prod-ServerlessDeploymentBucketName"
-      }
-    },
-    "BlueYonderRequestLambdaFunctionQualifiedArn": {
-      "Description": "Current Lambda function version",
-      "Value": {
-        "Ref": "BlueYonderRequestLambdaVersionb9kSnrPWX1rDz9MfJdS8XeyUXYehqS8BCmcdJrUC4"
-      },
-      "Export": {
-        "Name": "sls-pricing-algorithm-prod-prod-BlueYonderRequestLambdaFunctionQualifiedArn"
+        "Name": "sls-blueyonder-dev-ServerlessDeploymentBucketName"
       }
     },
     "BlueYonderQuoteLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "BlueYonderQuoteLambdaVersionoPzVqzEgJMdMmNwcU0p0UR0pD88Tzkxt6idycQ5PLc"
+        "Ref": "BlueYonderQuoteLambdaVersion4bKXDxld0XiReHYBcdRyFr29tycYPwkqVN580v7HNs"
       },
       "Export": {
-        "Name": "sls-pricing-algorithm-prod-prod-BlueYonderQuoteLambdaFunctionQualifiedArn"
+        "Name": "sls-blueyonder-dev-BlueYonderQuoteLambdaFunctionQualifiedArn"
+      }
+    },
+    "BlueYonderRequestLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "BlueYonderRequestLambdaVersionPXOVHQypUa972FIT4ewqdX8qLx9cZflA1WfhBQUPxU"
+      },
+      "Export": {
+        "Name": "sls-blueyonder-dev-BlueYonderRequestLambdaFunctionQualifiedArn"
       }
     },
     "BlueYonderResponseLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "BlueYonderResponseLambdaVersionmzMquMdGwMXUIuCa7TCcFvp9iR29oLTrA4ZTM0tkk0"
+        "Ref": "BlueYonderResponseLambdaVersionOmrA6YWo7xy7ZXmlp2D8RrKqLk0lzUhyPaO4AVpYlsU"
       },
       "Export": {
-        "Name": "sls-pricing-algorithm-prod-prod-BlueYonderResponseLambdaFunctionQualifiedArn"
+        "Name": "sls-blueyonder-dev-BlueYonderResponseLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {
@@ -1164,12 +1173,12 @@
             {
               "Ref": "AWS::URLSuffix"
             },
-            "/prod"
+            "/dev"
           ]
         ]
       },
       "Export": {
-        "Name": "sls-pricing-algorithm-prod-prod-ServiceEndpoint"
+        "Name": "sls-blueyonder-dev-ServiceEndpoint"
       }
     }
   }

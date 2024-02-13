@@ -63,6 +63,16 @@ BlueYonderQuoteExecutionRole:
               Resource: 
                 - !GetAtt PricingAlgoDynamoDBTable.Arn
                 - !GetAtt PricingAlgoDynamoDBTable.StreamArn
+      - PolicyName: S3-cross-AccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - s3:*
+              Resource: 
+                - arn:aws:s3:::pricing-algorithm/*
+                - arn:aws:s3:::pricing-algorithm
   # tags:
   #   - Key: Application
   #     Value: ${self:custom.application}

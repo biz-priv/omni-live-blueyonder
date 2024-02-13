@@ -1,11 +1,11 @@
-service: pricing-algorithm-prod 
+service: blueyonder 
 
 plugins:
   - serverless-python-requirements
 package:
   individually: true
 custom:
-    application: pricing-algo
+    application: pricing-algorithm
     GitHubBranch: master
     TechnicalContact: tgilbertson@omnilogistics.com
     BlueYonderApiGatewayResourcePath: "blueyonder"
@@ -13,7 +13,7 @@ provider:
     name: aws
     runtime: python3.9
     region: ${opt:region, "us-east-1"}
-    stage: ${opt:stage, "prod"}
+    stage: ${opt:stage, "dev"}
     stackTags:
         Application: Pricing Algorithm serverless application
         CreateBy: BizCloudExperts
@@ -25,12 +25,11 @@ EnvironmentIsProd:
     - prod
 
 functions:
-    ############ Lambda Functions ######################
     BlueYonderQuote: ${file(config/lambdafunctions/BlueYonderQuote.yml):BlueYonderQuoteLambda}
     BlueYonderRequest: ${file(config/lambdafunctions/BlueYonderRequest.yml):BlueYonderRequestLambda}
     BlueYonderResponse: ${file(config/lambdafunctions/BlueYonderResponse.yml):BlueYonderResponseLambda}
-
-resources:
+                
+resources: 
     Resources: 
         MyUsagePlan:
             Type: AWS::ApiGateway::UsagePlan
@@ -53,8 +52,7 @@ resources:
             Properties:
                 KeyId: !Ref MyApiKey
                 KeyType: API_KEY
-                UsagePlanId: !Ref MyUsagePlan
-                
+                UsagePlanId: !Ref MyUsagePlan       
         PricingAlgoGreenscreensPassword:
             Type: AWS::SSM::Parameter
             Properties:
@@ -89,14 +87,7 @@ resources:
                 Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/fuel-api-secret
                 Description: My SSM Parameter for Serverless App
                 Type: String
-                Value: myparametervalue
-        PricingAlgoE2OpenBasicAuthPassword:
-            Type: AWS::SSM::Parameter
-            Properties:
-                Name: /app/${self:custom.application}/${self:provider.stage}/${self:service}/e2open-secrets
-                Description: My SSM Parameter for Serverless App
-                Type: String
-                Value: myparametervalue       
+                Value: myparametervalue      
         # ################################################################################
         # I am roles
         ################################################################################
