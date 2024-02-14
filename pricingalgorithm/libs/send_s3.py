@@ -2,12 +2,13 @@ import boto3
 import json
 from datetime import datetime
 import pytz
-
+import os
+env=os.environ['ENVIRONMENT']
 def send_s3(data):
     # S3 bucket and object details
     current_datetime = datetime.now().strftime("%Y%m%d%H%M%S")
     s3_bucket_name = "pricing-algorithm"
-    s3_object_key = f"{current_datetime}-data.json"
+    s3_object_key = f"blueyonder/{env}/{current_datetime}-data.json"
     # Upload data to S3
     s3 = boto3.client("s3")
     data=str(data)
