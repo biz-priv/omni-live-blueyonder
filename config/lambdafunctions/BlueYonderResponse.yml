@@ -1,0 +1,51 @@
+BlueYonderResponseLambda:
+  name: ${self:service}-BlueYonderResponse-${self:provider.stage}
+  description: Sending response to Blue Yonder with pricing quote
+  handler: pricingalgorithm/blueyonder/blueyonderresponse/index.lambda_handler
+  layers:
+    - {Ref: BlueyonderLambdaLayer} 
+  role: BlueYonderResponseExecutionRole
+  # logGroup: BlueYonderResponseLogGroup
+  package:
+    patterns:
+      - "!**/*"
+      - "pricingalgorithm/blueyonder/blueyonderresponse/**"
+      - "pricingalgorithm/libs/**"
+  timeout: 60
+  runtime: python3.9
+  memorySize: 512
+  reservedConcurrency: 1 #   ReservedConcurrentExecutions: 1 # Limiting to 1. Can only create Blue Yonder Auth token every 2 hours.
+  events:
+    # - http:
+    #     path: blueyonder/blueyonderresponse
+    #     method: post
+    #     intergration: lambda
+    #     cors: true
+    - stream:
+        type: dynamodb
+        arn:
+          Fn::GetAtt:
+            - PricingAlgoDynamoDBTable
+            - StreamArn
+        batchSize: 1
+        startingPosition: TRIM_HORIZON
+        enabled: true
+        maximumRetryAttempts: 0
+        filterPatterns:
+          - { dynamodb: { NewImage: { NewQuote: { S: ['No'] } } } }
+  environment:
+    APPLICATION: ${self:custom.application}
+    ENVIRONMENT: ${self:provider.stage}
+    PRICING_ALGO_DB_TABLE: !Ref PricingAlgoDynamoDBTable
+    IMMUTABLE_ARCHIVE: ${self:custom.application}-${self:provider.stage}-${self:service}-PricingAlgoArchive
+    GREENSCREENS_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/greenscreens-secret
+    DAT_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/dat-secret
+    GOOGLE_API_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/google-api-secret
+    FUEL_API_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/fuel-api-secret
+    BLUE_YONDER_SECRETS: /app/pricing-algo/${self:provider.stage}/pricing-algorithm/blue-yonder-secrets
+  tags:
+    Application: ${self:custom.application}
+    Environment: ${self:provider.stage}
+    DeployableUnitName: ${self:service}
+    GitHubBranch: ${self:custom.GitHubBranch}
+    TechnicalContact: ${self:custom.TechnicalContact}

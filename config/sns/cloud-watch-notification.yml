@@ -1,0 +1,41 @@
+PricingAlgoNotificationTopic:
+  Type: AWS::SNS::Topic
+  Properties:
+    Tags:
+        - Key: Application
+          Value: ${self:custom.application}
+        - Key: DeployableUnitName
+          Value: ${self:service}
+        - Key: GitHubBranch
+          Value: ${opt:GitHubBranch, 'default-branch'}
+        - Key: Environment
+          Value: ${self:provider.stage}
+        - Key: Technical Contact
+          Value: ${opt:TechnicalContact, "tgilbertson@omnilogistics.com"}
+
+PricingAlgoNotificationTopicPolicy:
+  Type: AWS::SNS::TopicPolicy
+  Properties:
+    Topics: 
+      - !Ref PricingAlgoNotificationTopic
+    PolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Sid: AllowS3Events
+          Effect: Allow
+          Action: sns:Publish
+          Resource: '*'
+          Principal: '*'
+        - Sid: AllowAlarmEvents
+          Effect: Allow
+          Action: sns:Publish
+          Resource: '*'
+          Principal: '*' # Add "*" or specify specific AWS account ARN as needed
+
+# SubscribeContactsPricingAlgoTopic:
+#   Type: Custom::SubscribeToTopicCustomResource
+#   Properties:
+#       ServiceToken: !ImportValue SubscribeToTopicResourceArn
+#       TopicArn: !Ref PricingAlgoNotificationTopic
+#       Endpoints: ["twashburn@omnilogistics.com,tgilbertson@omnilogistics.com"]
+#       Protocol: email

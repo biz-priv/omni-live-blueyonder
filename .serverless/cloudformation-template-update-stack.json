@@ -1,0 +1,1185 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BlueYonderQuoteLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/blueyonder-BlueYonderQuote-dev"
+      }
+    },
+    "BlueYonderRequestLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/blueyonder-BlueYonderRequest-dev"
+      }
+    },
+    "BlueYonderResponseLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/blueyonder-BlueYonderResponse-dev"
+      }
+    },
+    "BlueYonderQuoteLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/blueyonder/dev/1707736071647-2024-02-12T11:07:51.647Z/BlueYonderQuote.zip"
+        },
+        "Handler": "pricingalgorithm/blueyonder/blueyonderquote/index.lambda_handler",
+        "Runtime": "python3.9",
+        "FunctionName": "blueyonder-BlueYonderQuote-dev",
+        "MemorySize": 512,
+        "Timeout": 60,
+        "Description": "Blue Yonder Pricing Algorithm",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "pricing-algorithm"
+          },
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "DeployableUnitName",
+            "Value": "blueyonder"
+          },
+          {
+            "Key": "GitHubBranch",
+            "Value": "master"
+          },
+          {
+            "Key": "TechnicalContact",
+            "Value": "tgilbertson@omnilogistics.com"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "APPLICATION": "pricing-algorithm",
+            "ENVIRONMENT": "dev",
+            "PRICING_ALGO_DB_TABLE": {
+              "Ref": "PricingAlgoDynamoDBTable"
+            },
+            "IMMUTABLE_ARCHIVE": "pricing-algorithm-dev-blueyonder-PricingAlgoArchive",
+            "GREENSCREENS_SECRET": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+            "DAT_SECRET": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+            "GOOGLE_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+            "FUEL_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
+            "BLUE_YONDER_SECRETS": "/app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "BlueYonderQuoteExecutionRole",
+            "Arn"
+          ]
+        },
+        "ReservedConcurrentExecutions": 1,
+        "Layers": [
+          "arn:aws:lambda:us-east-1:732780956165:layer:python:1"
+        ]
+      },
+      "DependsOn": [
+        "BlueYonderQuoteLogGroup",
+        "BlueYonderQuoteExecutionRole"
+      ]
+    },
+    "BlueYonderRequestLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/blueyonder/dev/1707736071647-2024-02-12T11:07:51.647Z/BlueYonderRequest.zip"
+        },
+        "Handler": "pricingalgorithm/blueyonder/blueyonderrequest/index.lambda_handler",
+        "Runtime": "python3.9",
+        "FunctionName": "blueyonder-BlueYonderRequest-dev",
+        "MemorySize": 512,
+        "Timeout": 60,
+        "Description": "Response to Blue Yonder request for quote",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "pricing-algorithm"
+          },
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "DeployableUnitName",
+            "Value": "blueyonder"
+          },
+          {
+            "Key": "GitHubBranch",
+            "Value": "master"
+          },
+          {
+            "Key": "TechnicalContact",
+            "Value": "tgilbertson@omnilogistics.com"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "APPLICATION": "pricing-algorithm",
+            "ENVIRONMENT": "dev",
+            "PRICING_ALGO_DB_TABLE": {
+              "Ref": "PricingAlgoDynamoDBTable"
+            },
+            "IMMUTABLE_ARCHIVE": "pricing-algorithm-dev-blueyonder-PricingAlgoArchive",
+            "GREENSCREENS_SECRET": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+            "DAT_SECRET": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+            "GOOGLE_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+            "FUEL_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
+            "BLUE_YONDER_SECRETS": "/app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "BlueYonderRequestExecutionRole",
+            "Arn"
+          ]
+        },
+        "ReservedConcurrentExecutions": 1,
+        "Layers": [
+          "arn:aws:lambda:us-east-1:732780956165:layer:python:1"
+        ]
+      },
+      "DependsOn": [
+        "BlueYonderRequestLogGroup",
+        "BlueYonderRequestExecutionRole"
+      ]
+    },
+    "BlueYonderResponseLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/blueyonder/dev/1707736071647-2024-02-12T11:07:51.647Z/BlueYonderResponse.zip"
+        },
+        "Handler": "pricingalgorithm/blueyonder/blueyonderresponse/index.lambda_handler",
+        "Runtime": "python3.9",
+        "FunctionName": "blueyonder-BlueYonderResponse-dev",
+        "MemorySize": 512,
+        "Timeout": 60,
+        "Description": "Sending response to Blue Yonder with pricing quote",
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "pricing-algorithm"
+          },
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "DeployableUnitName",
+            "Value": "blueyonder"
+          },
+          {
+            "Key": "GitHubBranch",
+            "Value": "master"
+          },
+          {
+            "Key": "TechnicalContact",
+            "Value": "tgilbertson@omnilogistics.com"
+          }
+        ],
+        "Environment": {
+          "Variables": {
+            "APPLICATION": "pricing-algorithm",
+            "ENVIRONMENT": "dev",
+            "PRICING_ALGO_DB_TABLE": {
+              "Ref": "PricingAlgoDynamoDBTable"
+            },
+            "IMMUTABLE_ARCHIVE": "pricing-algorithm-dev-blueyonder-PricingAlgoArchive",
+            "GREENSCREENS_SECRET": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+            "DAT_SECRET": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+            "GOOGLE_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+            "FUEL_API_SECRET": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
+            "BLUE_YONDER_SECRETS": "/app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "BlueYonderResponseExecutionRole",
+            "Arn"
+          ]
+        },
+        "ReservedConcurrentExecutions": 1,
+        "Layers": [
+          "arn:aws:lambda:us-east-1:732780956165:layer:python:1"
+        ]
+      },
+      "DependsOn": [
+        "BlueYonderResponseLogGroup",
+        "BlueYonderResponseExecutionRole"
+      ]
+    },
+    "BlueYonderQuoteLambdaVersion4bKXDxld0XiReHYBcdRyFr29tycYPwkqVN580v7HNs": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "BlueYonderQuoteLambdaFunction"
+        },
+        "CodeSha256": "WIGHBC3NpB3uI7Hrvuv7jHowWXqQlccrE5oZlkZkk24=",
+        "Description": "Blue Yonder Pricing Algorithm"
+      }
+    },
+    "BlueYonderRequestLambdaVersionPXOVHQypUa972FIT4ewqdX8qLx9cZflA1WfhBQUPxU": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "BlueYonderRequestLambdaFunction"
+        },
+        "CodeSha256": "DaFBA31HmvikT0meaOsyPoF8S9XRViNHatlvGlwC56U=",
+        "Description": "Response to Blue Yonder request for quote"
+      }
+    },
+    "BlueYonderResponseLambdaVersionOmrA6YWo7xy7ZXmlp2D8RrKqLk0lzUhyPaO4AVpYlsU": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "BlueYonderResponseLambdaFunction"
+        },
+        "CodeSha256": "zJZfvQOKdsQtkNE8ZO6P15zvNlDCT7rb5eRFEUvaDrk=",
+        "Description": "Sending response to Blue Yonder with pricing quote"
+      }
+    },
+    "ApiGatewayRestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "dev-blueyonder",
+        "EndpointConfiguration": {
+          "Types": [
+            "EDGE"
+          ]
+        },
+        "Policy": ""
+      }
+    },
+    "ApiGatewayResourceBlueyonder": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "blueyonder",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceBlueyonderBlueyonderrequest": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceBlueyonder"
+        },
+        "PathPart": "blueyonderrequest",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodBlueyonderBlueyonderrequestOptions": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "MethodResponses": [
+          {
+            "StatusCode": "200",
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Origin": true,
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true
+            },
+            "ResponseModels": {}
+          }
+        ],
+        "RequestParameters": {},
+        "Integration": {
+          "Type": "MOCK",
+          "RequestTemplates": {
+            "application/json": "{statusCode:200}"
+          },
+          "ContentHandling": "CONVERT_TO_TEXT",
+          "IntegrationResponses": [
+            {
+              "StatusCode": "200",
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+              },
+              "ResponseTemplates": {
+                "application/json": ""
+              }
+            }
+          ]
+        },
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceBlueyonderBlueyonderrequest"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayMethodBlueyonderBlueyonderrequestPost": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "POST",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceBlueyonderBlueyonderrequest"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": true,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "BlueYonderRequestLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      },
+      "DependsOn": [
+        "BlueYonderRequestLambdaPermissionApiGateway"
+      ]
+    },
+    "ApiGatewayDeployment1707736069970": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "StageName": "dev"
+      },
+      "DependsOn": [
+        "ApiGatewayMethodBlueyonderBlueyonderrequestOptions",
+        "ApiGatewayMethodBlueyonderBlueyonderrequestPost"
+      ]
+    },
+    "BlueYonderRequestLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "BlueYonderRequestLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "BlueYonderQuoteEventSourceMappingDynamodbPricingAlgoDynamoDBTable": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "BlueYonderQuoteExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 1,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "PricingAlgoDynamoDBTable",
+            "StreamArn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "BlueYonderQuoteLambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "TRIM_HORIZON",
+        "MaximumRetryAttempts": 0,
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"dynamodb\":{\"NewImage\":{\"NewQuote\":{\"S\":[\"Yes\"]}}}}"
+            }
+          ]
+        }
+      }
+    },
+    "BlueYonderResponseEventSourceMappingDynamodbPricingAlgoDynamoDBTable": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "DependsOn": [
+        "BlueYonderResponseExecutionRole"
+      ],
+      "Properties": {
+        "BatchSize": 1,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Fn::GetAtt": [
+            "PricingAlgoDynamoDBTable",
+            "StreamArn"
+          ]
+        },
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "BlueYonderResponseLambdaFunction",
+            "Arn"
+          ]
+        },
+        "StartingPosition": "TRIM_HORIZON",
+        "MaximumRetryAttempts": 0,
+        "FilterCriteria": {
+          "Filters": [
+            {
+              "Pattern": "{\"dynamodb\":{\"NewImage\":{\"NewQuote\":{\"S\":[\"No\"]}}}}"
+            }
+          ]
+        }
+      }
+    },
+    "MyUsagePlan": {
+      "Type": "AWS::ApiGateway::UsagePlan",
+      "Properties": {
+        "ApiStages": [
+          {
+            "ApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "Stage": "dev"
+          }
+        ],
+        "Description": "Blueyonder Usage plan",
+        "UsagePlanName": "Blueyonder"
+      }
+    },
+    "MyApiKey": {
+      "Type": "AWS::ApiGateway::ApiKey",
+      "Properties": {
+        "Name": "blueyonder",
+        "Enabled": true,
+        "StageKeys": [
+          {
+            "RestApiId": {
+              "Ref": "ApiGatewayRestApi"
+            },
+            "StageName": "dev"
+          }
+        ]
+      }
+    },
+    "MyUsagePlanKey": {
+      "Type": "AWS::ApiGateway::UsagePlanKey",
+      "Properties": {
+        "KeyId": {
+          "Ref": "MyApiKey"
+        },
+        "KeyType": "API_KEY",
+        "UsagePlanId": {
+          "Ref": "MyUsagePlan"
+        }
+      }
+    },
+    "PricingAlgoGreenscreensPassword": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": "/app/pricing-algorithm/dev/blueyonder/greenscreens-secret",
+        "Description": "My SSM Parameter for Serverless App",
+        "Type": "String",
+        "Value": "myparametervalue"
+      }
+    },
+    "PricingAlgoDATPassword": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": "/app/pricing-algorithm/dev/blueyonder/dat-secret",
+        "Description": "My SSM Parameter for Serverless App",
+        "Type": "String",
+        "Value": "myparametervalue"
+      }
+    },
+    "PricingAlgoGoogleAPIPassword": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": "/app/pricing-algorithm/dev/blueyonder/google-api-secret",
+        "Description": "My SSM Parameter for Serverless App",
+        "Type": "String",
+        "Value": "myparametervalue"
+      }
+    },
+    "PricingAlgoBlueYonderToken": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": "/app/pricing-algorithm/dev/blueyonder/blue-yonder-secrets",
+        "Description": "My SSM Parameter for Serverless App",
+        "Type": "String",
+        "Value": "myparametervalue"
+      }
+    },
+    "PricingAlgoFuelAPIPassword": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": "/app/pricing-algorithm/dev/blueyonder/fuel-api-secret",
+        "Description": "My SSM Parameter for Serverless App",
+        "Type": "String",
+        "Value": "myparametervalue"
+      }
+    },
+    "BlueYonderQuoteExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/",
+        "RoleName": "BlueYonderQuoteExecutionRole",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "cwl-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "BlueYonderQuoteLogGroup",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "s3-archive-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ssm-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ses-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ses:SendEmail"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "DynamoDBAccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query",
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetShardIterator",
+                    "dynamodb:DescribeStream",
+                    "dynamodb:ListStreams"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "PricingAlgoDynamoDBTable",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "PricingAlgoDynamoDBTable",
+                        "StreamArn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "S3-cross-AccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:*"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::pricing-algorithm/*",
+                    "arn:aws:s3:::pricing-algorithm"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "BlueYonderRequestExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "cwl-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "s3-archive-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ssm-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ses-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ses:SendEmail"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "DynamoDBAccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query",
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "PricingAlgoDynamoDBTable",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "BlueYonderResponseExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/",
+        "RoleName": "BlueYonderResponseExecutionRole",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "sts:AssumeRole",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "cwl-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "BlueYonderResponseLogGroup",
+                      "Arn"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "s3-archive-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ssm-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameters"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ssm-put-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:PutParameter"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "ses-access",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ses:SendEmail"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "DynamoDBAccessPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query",
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:GetRecords",
+                    "dynamodb:GetShardIterator",
+                    "dynamodb:DescribeStream",
+                    "dynamodb:ListStreams"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "PricingAlgoDynamoDBTable",
+                        "Arn"
+                      ]
+                    },
+                    {
+                      "Fn::GetAtt": [
+                        "PricingAlgoDynamoDBTable",
+                        "StreamArn"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "PricingAlgoNotificationTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "pricing-algorithm"
+          },
+          {
+            "Key": "DeployableUnitName",
+            "Value": "blueyonder"
+          },
+          {
+            "Key": "GitHubBranch",
+            "Value": "default-branch"
+          },
+          {
+            "Key": "Environment",
+            "Value": "dev"
+          },
+          {
+            "Key": "Technical Contact",
+            "Value": "tgilbertson@omnilogistics.com"
+          }
+        ]
+      }
+    },
+    "PricingAlgoNotificationTopicPolicy": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Properties": {
+        "Topics": [
+          {
+            "Ref": "PricingAlgoNotificationTopic"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "AllowS3Events",
+              "Effect": "Allow",
+              "Action": "sns:Publish",
+              "Resource": "*",
+              "Principal": "*"
+            },
+            {
+              "Sid": "AllowAlarmEvents",
+              "Effect": "Allow",
+              "Action": "sns:Publish",
+              "Resource": "*",
+              "Principal": "*"
+            }
+          ]
+        }
+      }
+    },
+    "PricingAlgoDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "message_id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "message_id",
+            "KeyType": "HASH"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-blueyonder-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "BlueYonderQuoteLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "BlueYonderQuoteLambdaVersion4bKXDxld0XiReHYBcdRyFr29tycYPwkqVN580v7HNs"
+      },
+      "Export": {
+        "Name": "sls-blueyonder-dev-BlueYonderQuoteLambdaFunctionQualifiedArn"
+      }
+    },
+    "BlueYonderRequestLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "BlueYonderRequestLambdaVersionPXOVHQypUa972FIT4ewqdX8qLx9cZflA1WfhBQUPxU"
+      },
+      "Export": {
+        "Name": "sls-blueyonder-dev-BlueYonderRequestLambdaFunctionQualifiedArn"
+      }
+    },
+    "BlueYonderResponseLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "BlueYonderResponseLambdaVersionOmrA6YWo7xy7ZXmlp2D8RrKqLk0lzUhyPaO4AVpYlsU"
+      },
+      "Export": {
+        "Name": "sls-blueyonder-dev-BlueYonderResponseLambdaFunctionQualifiedArn"
+      }
+    },
+    "ServiceEndpoint": {
+      "Description": "URL of the service endpoint",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "ApiGatewayRestApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            },
+            "/dev"
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "sls-blueyonder-dev-ServiceEndpoint"
+      }
+    }
+  }
+}

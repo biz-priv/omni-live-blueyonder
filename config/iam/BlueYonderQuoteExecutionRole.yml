@@ -1,0 +1,86 @@
+BlueYonderQuoteExecutionRole:
+  Type: AWS::IAM::Role
+  Properties:
+    Path: /
+    RoleName: 'BlueYonderQuoteExecutionRole'
+    AssumeRolePolicyDocument:
+      Version: '2012-10-17'
+      Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action: sts:AssumeRole
+    Policies:
+      - PolicyName: cwl-access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: !GetAtt BlueYonderQuoteLogGroup.Arn
+      - PolicyName: s3-archive-access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource: '*'
+      - PolicyName: ssm-access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:GetParameters
+              Resource: '*'
+      - PolicyName: ses-access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+              Resource: '*'
+      - PolicyName: DynamoDBAccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Query
+                - dynamodb:GetItem
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:GetRecords
+                - dynamodb:GetShardIterator
+                - dynamodb:DescribeStream
+                - dynamodb:ListStreams
+              Resource: 
+                - !GetAtt PricingAlgoDynamoDBTable.Arn
+                - !GetAtt PricingAlgoDynamoDBTable.StreamArn
+      - PolicyName: S3-cross-AccessPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - s3:*
+              Resource: 
+                - arn:aws:s3:::pricing-algorithm/*
+                - arn:aws:s3:::pricing-algorithm
+  # tags:
+  #   - Key: Application
+  #     Value: ${self:custom.application}
+  #   - Key: Environment
+  #     Value: ${self:provider.stage}
+  #   - Key: DeployableUnitName
+  #     Value: ${self:service}
+  #   - Key: GitHubBranch
+  #     Value:  ${self:custom.GitHubBranch}
+  #   - Key: Technical Contact
+  #     Value: ${self:custom.TechnicalContact}
