@@ -1,5 +1,0 @@
-BlueYonderQuoteLogGroup:
-  Type: AWS::Logs::LogGroup
-  Properties:
-    LogGroupName:  /aws/lambda/${self:service}-BlueYonderQuote
-    RetentionInDays: 7
