@@ -3,7 +3,7 @@ BlueYonderResponseLambda:
   description: Sending response to Blue Yonder with pricing quote
   handler: pricingalgorithm/blueyonder/blueyonderresponse/index.lambda_handler
   layers:
-      - arn:aws:lambda:us-east-1:732780956165:layer:python:1
+    - {Ref: BlueyonderLambdaLayer} 
   role: BlueYonderResponseExecutionRole
   # logGroup: BlueYonderResponseLogGroup
   package:
@@ -42,7 +42,7 @@ BlueYonderResponseLambda:
     DAT_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/dat-secret
     GOOGLE_API_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/google-api-secret
     FUEL_API_SECRET: /app/${self:custom.application}/${self:provider.stage}/${self:service}/fuel-api-secret
-    BLUE_YONDER_SECRETS: /app/pricing-algo/prod/pricing-algorithm/blue-yonder-secrets
+    BLUE_YONDER_SECRETS: /app/pricing-algo/${self:provider.stage}/pricing-algorithm/blue-yonder-secrets
   tags:
     Application: ${self:custom.application}
     Environment: ${self:provider.stage}

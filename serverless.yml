@@ -4,7 +4,17 @@ plugins:
   - serverless-python-requirements
 package:
   individually: true
+layers:
+  blueyonder:
+    name: ${self:provider.stage}-blueyonder
+    compatibleRuntimes:
+      - python3.9
+    package:
+      artifact: lambdaLayer/lib/python3.9/python.zip 
+    description: "Dependencies for python functions"
 custom:
+    pythonRequirements:
+      dockerizePip: true
     application: pricing-algorithm
     GitHubBranch: master
     TechnicalContact: tgilbertson@omnilogistics.com
